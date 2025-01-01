@@ -10,8 +10,17 @@ import { UserSeedModule } from './user/user-seed.module';
 import databaseConfig from '../../config/database.config';
 import appConfig from '../../../config/app.config';
 
+import { CategorySeedModule } from './category/category-seed.module';
+
+import { ProductSeedModule } from './product/product-seed.module';
+
+import { FeatureSeedModule } from './feature/feature-seed.module';
+
 @Module({
   imports: [
+    FeatureSeedModule,
+    ProductSeedModule,
+    CategorySeedModule,
     RoleSeedModule,
     StatusSeedModule,
     UserSeedModule,

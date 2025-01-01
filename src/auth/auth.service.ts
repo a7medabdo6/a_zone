@@ -39,8 +39,21 @@ export class AuthService {
     private configService: ConfigService<AllConfigType>,
   ) {}
 
-  async validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseDto> {
-    const user = await this.usersService.findByEmail(loginDto.email);
+  async validateLogin(loginDto: AuthEmailLoginDto): Promise<any> {
+    const isEmail = (identifier: string): boolean => {
+      // Simple regex for validating email address format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(identifier);
+    };
+
+    let user;
+    if (isEmail(loginDto.email)) {
+      user = await this.usersService.findByEmail(loginDto.email);
+      console.log(user, 'user login');
+    } else {
+      user = await this.usersService.findByUsername(loginDto.email);
+      // console.log(loginDto.email, 'isEmailisEmailisEmail');
+    }
 
     if (!user) {
       throw new UnprocessableEntityException({
@@ -99,7 +112,6 @@ export class AuthService {
       sessionId: session.id,
       hash,
     });
-
     return {
       refreshToken,
       token,
@@ -144,15 +156,23 @@ export class AuthService {
 
       user = await this.usersService.create({
         email: socialEmail ?? null,
-        firstName: socialData.firstName ?? null,
-        lastName: socialData.lastName ?? null,
+        name: socialData.firstName ?? null,
+        username: socialData.lastName ?? null,
+
         socialId: socialData.id,
         provider: authProvider,
         role,
         status,
       });
-
-      user = await this.usersService.findById(user.id);
+      if (!user) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            user: 'userNotFound',
+          },
+        });
+      }
+      user = await this.usersService.findById(user?.id);
     }
 
     if (!user) {
@@ -184,7 +204,6 @@ export class AuthService {
       sessionId: session.id,
       hash,
     });
-
     return {
       refreshToken,
       token: jwtToken,
@@ -197,14 +216,21 @@ export class AuthService {
     const user = await this.usersService.create({
       ...dto,
       email: dto.email,
-      role: {
-        id: RoleEnum.user,
-      },
+      username: dto.usename,
+      name: dto.name,
+
       status: {
-        id: StatusEnum.inactive,
+        id: StatusEnum.active,
       },
     });
-
+    if (!user) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          user: 'userNotFound',
+        },
+      });
+    }
     const hash = await this.jwtService.signAsync(
       {
         confirmEmailUserId: user.id,
@@ -219,12 +245,12 @@ export class AuthService {
       },
     );
 
-    await this.mailService.userSignUp({
-      to: dto.email,
-      data: {
-        hash,
-      },
-    });
+    // await this.mailService.userSignUp({
+    //   to: dto.email,
+    //   data: {
+    //     hash,
+    //   },
+    // });
   }
 
   async confirmEmail(hash: string): Promise<void> {

@@ -24,6 +24,13 @@ export class UsersRelationalRepository implements UserRepository {
     );
     return UserMapper.toDomain(newEntity);
   }
+  async save(data: User): Promise<User> {
+    const persistenceModel = UserMapper.toPersistence(data);
+    const newEntity = await this.usersRepository.save(
+      this.usersRepository.create(persistenceModel),
+    );
+    return UserMapper.toDomain(newEntity);
+  }
 
   async findManyWithPagination({
     filterOptions,
@@ -57,7 +64,7 @@ export class UsersRelationalRepository implements UserRepository {
     return entities.map((user) => UserMapper.toDomain(user));
   }
 
-  async findById(id: User['id']): Promise<NullableType<User>> {
+  async findById(id: User['id']): Promise<NullableType<any>> {
     const entity = await this.usersRepository.findOne({
       where: { id: Number(id) },
     });
@@ -65,11 +72,56 @@ export class UsersRelationalRepository implements UserRepository {
     return entity ? UserMapper.toDomain(entity) : null;
   }
 
-  async findByEmail(email: User['email']): Promise<NullableType<User>> {
+  async findOrdersById(id: User['id']): Promise<NullableType<any>> {
+    const entity = await this.usersRepository.findOne({
+      where: { id: Number(id) },
+      relations: ['orders', 'orders.orderItems', 'orders.orderItems.product'], //'carts.products'
+      select: {
+        id: true, // You can add more user fields here if necessary
+
+        orders: {
+          id: true, // Only order IDs
+          orderItems: {
+            id: true, // Only orderItem IDs
+            product: {
+              id: true, // Only product IDs inside orderItems
+            },
+          },
+        },
+      },
+    });
+    if (entity) {
+      const productIds = entity.orders?.flatMap((order) =>
+        order.orderItems.map((orderItem) => orderItem.product.id),
+      );
+
+      return {
+        userId: entity.id,
+        productIds, // Only returning product IDs
+      };
+    }
+
+    return null;
+    // return entity ? UserMapper.toDomain(entity) : null;
+  }
+
+  async findByEmail(email: User['email']): Promise<NullableType<any>> {
     if (!email) return null;
 
     const entity = await this.usersRepository.findOne({
       where: { email },
+      relations: ['carts', 'fav', 'fav.favItems', 'fav.favItems.product'], //'carts.products'
+    });
+
+    return entity ? UserMapper.toDomain(entity) : null;
+  }
+  async findByUsername(
+    username: User['username'],
+  ): Promise<NullableType<User>> {
+    if (!username) return null;
+
+    const entity = await this.usersRepository.findOne({
+      where: { username: username },
     });
 
     return entity ? UserMapper.toDomain(entity) : null;

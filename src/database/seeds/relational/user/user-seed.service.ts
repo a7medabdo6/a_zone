@@ -29,9 +29,9 @@ export class UserSeedService {
 
       await this.repository.save(
         this.repository.create({
-          firstName: 'Super',
-          lastName: 'Admin',
-          email: 'admin@example.com',
+          name: 'Super',
+          username: 'Admin',
+          email: 'admin@admin.com',
           password,
           role: {
             id: RoleEnum.admin,
@@ -59,13 +59,43 @@ export class UserSeedService {
 
       await this.repository.save(
         this.repository.create({
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john.doe@example.com',
+          name: 'user',
+          username: 'user',
+          email: 'user@user.com',
           password,
           role: {
             id: RoleEnum.user,
-            name: 'Admin',
+            name: 'user',
+          },
+          status: {
+            id: StatusEnum.active,
+            name: 'Active',
+          },
+        }),
+      );
+    }
+
+    const countManager = await this.repository.count({
+      where: {
+        role: {
+          id: RoleEnum.manager,
+        },
+      },
+    });
+
+    if (!countManager) {
+      const salt = await bcrypt.genSalt();
+      const password = await bcrypt.hash('secret', salt);
+
+      await this.repository.save(
+        this.repository.create({
+          name: 'manager',
+          username: 'manager',
+          email: 'manager@manager.com',
+          password,
+          role: {
+            id: RoleEnum.manager,
+            name: 'manager',
           },
           status: {
             id: StatusEnum.active,

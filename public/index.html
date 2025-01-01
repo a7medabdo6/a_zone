@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Server-Sent Events (SSE) Example</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 50px;
+      }
+      h1 {
+        color: #333;
+      }
+      #notifications {
+        margin-top: 20px;
+      }
+      .notification {
+        padding: 10px;
+        background-color: #f0f0f0;
+        margin-bottom: 10px;
+      }
+      .error {
+        background-color: #ffcccb;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Real-Time Notifications</h1>
+    <div id="notifications"></div>
+
+    <script>
+      // Initialize EventSource to listen to SSE events from the server
+      const eventSource = new EventSource(
+        'http://localhost:3000/api/notifications',
+      );
+
+      // Listen for 'open' event to confirm connection was successful
+      eventSource.onopen = function (event) {
+        console.log('Connection established with the server.');
+      };
+
+      // Listen for 'message' event (default type)
+      eventSource.onmessage = function (event) {
+        const message = event.data; // The message data sent by the server
+        console.log('Received message:', message);
+
+        // Display the message on the webpage
+        const notificationsDiv = document.getElementById('notifications');
+        const notificationElement = document.createElement('div');
+        notificationElement.classList.add('notification');
+        notificationElement.textContent = message;
+        notificationsDiv.appendChild(notificationElement);
+      };
+
+      // Listen for a custom event ('error' in this case)
+      eventSource.addEventListener('error', function (event) {
+        const errorMessage = event.data;
+        console.error('Error event:', errorMessage);
+
+        const notificationsDiv = document.getElementById('notifications');
+        const notificationElement = document.createElement('div');
+        notificationElement.classList.add('notification', 'error');
+        notificationElement.textContent = `Error: ${errorMessage}`;
+        notificationsDiv.appendChild(notificationElement);
+      });
+
+      // Handle connection errors (e.g., network issues)
+      eventSource.onerror = function (event) {
+        console.error('Error with SSE connection:', event);
+        alert('There was an error with the SSE connection.');
+      };
+    </script>
+  </body>
+</html>

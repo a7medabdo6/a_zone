@@ -3,6 +3,9 @@ import { FileType } from '../../files/domain/file';
 import { Role } from '../../roles/domain/role';
 import { Status } from '../../statuses/domain/status';
 import { ApiProperty } from '@nestjs/swagger';
+import { Cart } from '../../cart/entities/cart.entity';
+import { Order } from '../../order/entities/order.entity';
+import { Fav } from '../../fav/entities/fav.entity';
 
 const idType = Number;
 
@@ -43,13 +46,13 @@ export class User {
     type: String,
     example: 'John',
   })
-  firstName: string | null;
+  name: string | null;
 
   @ApiProperty({
     type: String,
     example: 'Doe',
   })
-  lastName: string | null;
+  username: string | null;
 
   @ApiProperty({
     type: () => FileType,
@@ -65,6 +68,21 @@ export class User {
     type: () => Status,
   })
   status?: Status;
+
+  @ApiProperty({
+    type: () => Cart,
+  })
+  carts?: Cart[];
+
+  @ApiProperty({
+    type: () => Order,
+  })
+  orders?: Order[];
+
+  @ApiProperty({
+    type: () => Fav,
+  })
+  fav?: Fav | null;
 
   @ApiProperty()
   createdAt: Date;

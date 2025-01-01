@@ -37,7 +37,7 @@ import { RolesGuard } from '../roles/roles.guard';
 import { infinityPagination } from '../utils/infinity-pagination';
 
 @ApiBearerAuth()
-@Roles(RoleEnum.admin)
+@Roles(RoleEnum.admin, RoleEnum.user, RoleEnum.manager)
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @ApiTags('Users')
 @Controller({
@@ -55,7 +55,7 @@ export class UsersController {
   })
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createProfileDto: CreateUserDto): Promise<User> {
+  create(@Body() createProfileDto: CreateUserDto): Promise<User | null> {
     return this.usersService.create(createProfileDto);
   }
 
@@ -88,12 +88,27 @@ export class UsersController {
       { page, limit },
     );
   }
-
   @ApiOkResponse({
     type: User,
   })
   @SerializeOptions({
-    groups: ['admin'],
+    groups: ['me', 'admin'],
+  })
+  @Get(':id/all-products-at-orders')
+  @HttpCode(HttpStatus.OK)
+  @ApiParam({
+    name: 'id',
+    type: String,
+    required: true,
+  })
+  findOrders(@Param('id') id: User['id']): Promise<NullableType<User>> {
+    return this.usersService.findOrdersById(id);
+  }
+  @ApiOkResponse({
+    type: User,
+  })
+  @SerializeOptions({
+    groups: ['me', 'admin'],
   })
   @Get(':id')
   @HttpCode(HttpStatus.OK)

@@ -1,4 +1,25 @@
 {
   "confirmEmail": "Confirm email",
-  "resetPassword": "Reset password"
+  "resetPassword": "Reset password",
+  "validation": {
+    "name_en": "The name in English is required.",
+    "name_ar": "The name in Arabic is required.",
+    "desc_en": "The description in English is required.",
+    "desc_ar": "The description in Arabic is required.",
+    "working_hours_en": "Working hours in English are optional.",
+    "working_hours_ar": "Working hours in Arabic are optional.",
+    "location_en": "Location in English is optional.",
+    "location_ar": "Location in Arabic is optional.",
+    "price_per_night": "The price per night must be a valid number or string.",
+    "userId": "Please provide a valid User ID (number).",
+    "photo": "A photo of the product is required.",
+    "categories": "Please provide an array of valid category IDs.",
+    "features": "Please provide an array of valid feature IDs.",
+    "expirationDate must be a Date instance": "expirationDate must be a Date instance",
+    "code": "The code of the coupon must not be empty and should be a valid string.",
+    "discountPercentage": "The discount percentage must be a valid number and cannot be empty.",
+    "expirationDate": "The expiration date must be a valid date instance.",
+    "products": "The products array cannot be empty and must contain valid products.",
+    "icon": "The icon is required."
+  }
 }

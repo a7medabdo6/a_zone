@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
   JoinColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { RoleEntity } from '../../../../../roles/infrastructure/persistence/relational/entities/role.entity';
 import { StatusEntity } from '../../../../../statuses/infrastructure/persistence/relational/entities/status.entity';
@@ -23,6 +24,11 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
 // in your project and return an ORM entity directly in response.
 import { Exclude, Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Cart } from '../../../../../cart/entities/cart.entity';
+import { Order } from '../../../../../order/entities/order.entity';
+import { Product } from '../../../../../product/entities/product.entity';
+import { Fav } from '../../../../../fav/entities/fav.entity';
+import { Wallet } from '../../../../../wallet/entities/wallet.entity';
 
 @Entity({
   name: 'user',
@@ -79,15 +85,15 @@ export class UserEntity extends EntityRelationalHelper {
   })
   @Index()
   @Column({ type: String, nullable: true })
-  firstName: string | null;
+  name: string | null;
 
   @ApiProperty({
     type: String,
     example: 'Doe',
   })
   @Index()
-  @Column({ type: String, nullable: true })
-  lastName: string | null;
+  @Column({ type: String, unique: true, nullable: true })
+  username: string | null;
 
   @ApiProperty({
     type: () => FileEntity,
@@ -106,6 +112,12 @@ export class UserEntity extends EntityRelationalHelper {
   })
   role?: RoleEntity | null;
 
+  @OneToMany(() => Cart, (cart) => cart.user)
+  carts: Cart[];
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
+
   @ApiProperty({
     type: () => StatusEntity,
   })
@@ -113,6 +125,18 @@ export class UserEntity extends EntityRelationalHelper {
     eager: true,
   })
   status?: StatusEntity;
+
+  @OneToMany(() => Product, (product) => product.user) // One user has many products
+  products: Product[];
+
+  @ApiProperty()
+  @OneToOne(() => Fav, (favoriteList) => favoriteList.user)
+  @JoinColumn()
+  fav: Fav | null | undefined;
+
+  @OneToOne(() => Wallet, (wallet) => wallet.user, { cascade: true })
+  @JoinColumn()
+  wallet: Wallet;
 
   @ApiProperty()
   @CreateDateColumn()

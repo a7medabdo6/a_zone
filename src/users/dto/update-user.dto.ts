@@ -26,11 +26,11 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiPropertyOptional({ example: 'John', type: String })
   @IsOptional()
-  firstName?: string | null;
+  name?: string | null;
 
   @ApiPropertyOptional({ example: 'Doe', type: String })
   @IsOptional()
-  lastName?: string | null;
+  username?: string | null;
 
   @ApiPropertyOptional({ type: () => FileDto })
   @IsOptional()

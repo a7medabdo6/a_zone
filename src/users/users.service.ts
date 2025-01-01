@@ -16,18 +16,22 @@ import { StatusEnum } from '../statuses/statuses.enum';
 import { IPaginationOptions } from '../utils/types/pagination-options';
 import { DeepPartial } from '../utils/types/deep-partial.type';
 
+import { UserEntity } from './infrastructure/persistence/relational/entities/user.entity';
+
 @Injectable()
 export class UsersService {
   constructor(
     private readonly usersRepository: UserRepository,
+
     private readonly filesService: FilesService,
   ) {}
 
-  async create(createProfileDto: CreateUserDto): Promise<User> {
+  async create(createProfileDto: CreateUserDto) {
     const clonedPayload = {
       provider: AuthProvidersEnum.email,
       ...createProfileDto,
     };
+    console.log(createProfileDto, 'createProfileDto');
 
     if (clonedPayload.password) {
       const salt = await bcrypt.genSalt();
@@ -47,8 +51,21 @@ export class UsersService {
         });
       }
     }
+    if (clonedPayload.username) {
+      const userObject = await this.usersRepository.findByUsername(
+        clonedPayload.username,
+      );
+      if (userObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            username: 'usernameAlreadyExists',
+          },
+        });
+      }
+    }
 
-    if (clonedPayload.photo?.id) {
+    if (clonedPayload?.photo?.id) {
       const fileObject = await this.filesService.findById(
         clonedPayload.photo.id,
       );
@@ -77,7 +94,7 @@ export class UsersService {
       }
     }
 
-    if (clonedPayload.status?.id) {
+    if (clonedPayload?.status?.id) {
       const statusObject = Object.values(StatusEnum)
         .map(String)
         .includes(String(clonedPayload.status.id));
@@ -90,8 +107,11 @@ export class UsersService {
         });
       }
     }
+    console.log(clonedPayload, 'clonedPayload');
 
-    return this.usersRepository.create(clonedPayload);
+    return this.usersRepository.create({
+      ...clonedPayload,
+    });
   }
 
   findManyWithPagination({
@@ -110,12 +130,20 @@ export class UsersService {
     });
   }
 
-  findById(id: User['id']): Promise<NullableType<User>> {
-    return this.usersRepository.findById(id);
+  async findById(id: User['id']): Promise<NullableType<any>> {
+    const user = await this.usersRepository.findById(id);
+    return user;
+  }
+  async findOrdersById(id: User['id']): Promise<NullableType<any>> {
+    const user = await this.usersRepository.findOrdersById(id);
+    return user;
   }
 
   findByEmail(email: User['email']): Promise<NullableType<User>> {
     return this.usersRepository.findByEmail(email);
+  }
+  findByUsername(value): Promise<NullableType<User>> {
+    return this.usersRepository.findByUsername(value);
   }
 
   findBySocialIdAndProvider({

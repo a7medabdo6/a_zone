@@ -27,6 +27,18 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
+import { CategoryModule } from './category/category.module';
+import { ProductModule } from './product/product.module';
+import { CartModule } from './cart/cart.module';
+import { OrderModule } from './order/order.module';
+import { FeatureModule } from './feature/feature.module';
+import { FavModule } from './fav/fav.module';
+import { CouponModule } from './coupon/coupon.module';
+import { WalletModule } from './wallet/wallet.module';
+import { TransactionModule } from './transaction/transaction.module';
+import { NotificationsService } from './notifications/notifications.service';
+import { NotificationsController } from './notifications/notifications.controller';
+import { NotificationsModule } from './notifications/notifications.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -87,6 +99,17 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     MailModule,
     MailerModule,
     HomeModule,
+    CategoryModule,
+    ProductModule,
+
+    CartModule,
+    OrderModule,
+    FeatureModule,
+    FavModule,
+    CouponModule,
+    WalletModule,
+    TransactionModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}

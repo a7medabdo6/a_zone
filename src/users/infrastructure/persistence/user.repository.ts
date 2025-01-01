@@ -9,6 +9,7 @@ export abstract class UserRepository {
   abstract create(
     data: Omit<User, 'id' | 'createdAt' | 'deletedAt' | 'updatedAt'>,
   ): Promise<User>;
+  abstract save(user: DeepPartial<User>): Promise<User>;
 
   abstract findManyWithPagination({
     filterOptions,
@@ -21,7 +22,18 @@ export abstract class UserRepository {
   }): Promise<User[]>;
 
   abstract findById(id: User['id']): Promise<NullableType<User>>;
+
+  abstract findOrdersById(id: User['id']): Promise<NullableType<User>>;
+
   abstract findByEmail(email: User['email']): Promise<NullableType<User>>;
+  // abstract findByEmailOrUsername(
+  //   identifier: string,
+  // ): Promise<NullableType<User>>;
+
+  abstract findByUsername(
+    username: User['username'],
+  ): Promise<NullableType<User>>;
+
   abstract findBySocialIdAndProvider({
     socialId,
     provider,

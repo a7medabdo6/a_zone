@@ -7,6 +7,8 @@ import { UserEntity } from '../entities/user.entity';
 
 export class UserMapper {
   static toDomain(raw: UserEntity): User {
+    console.log(raw, 'rawrawraw');
+
     const domainEntity = new User();
     domainEntity.id = raw.id;
     domainEntity.email = raw.email;
@@ -14,16 +16,20 @@ export class UserMapper {
     domainEntity.previousPassword = raw.previousPassword;
     domainEntity.provider = raw.provider;
     domainEntity.socialId = raw.socialId;
-    domainEntity.firstName = raw.firstName;
-    domainEntity.lastName = raw.lastName;
+    domainEntity.name = raw.name;
+    domainEntity.username = raw.username;
+    domainEntity.fav = raw.fav;
     if (raw.photo) {
       domainEntity.photo = FileMapper.toDomain(raw.photo);
     }
     domainEntity.role = raw.role;
     domainEntity.status = raw.status;
+    domainEntity.orders = raw.orders;
+
     domainEntity.createdAt = raw.createdAt;
     domainEntity.updatedAt = raw.updatedAt;
     domainEntity.deletedAt = raw.deletedAt;
+    domainEntity.carts = raw.carts;
     return domainEntity;
   }
 
@@ -61,10 +67,13 @@ export class UserMapper {
     persistenceEntity.previousPassword = domainEntity.previousPassword;
     persistenceEntity.provider = domainEntity.provider;
     persistenceEntity.socialId = domainEntity.socialId;
-    persistenceEntity.firstName = domainEntity.firstName;
-    persistenceEntity.lastName = domainEntity.lastName;
+    persistenceEntity.name = domainEntity.name;
+    persistenceEntity.username = domainEntity.username;
+
     persistenceEntity.photo = photo;
     persistenceEntity.role = role;
+    persistenceEntity.fav = domainEntity.fav;
+
     persistenceEntity.status = status;
     persistenceEntity.createdAt = domainEntity.createdAt;
     persistenceEntity.updatedAt = domainEntity.updatedAt;
